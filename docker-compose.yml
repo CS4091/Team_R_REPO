@@ -1,0 +1,50 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_container
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  
+  server:
+    build:
+      context: capstone2-server
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - ./capstone2-server:/app
+    working_dir: /app
+    command: python3 manage.py runserver 0.0.0.0:8000
+  nginx:
+    image: nginx:latest
+    container_name: capston2_proxy
+  
+    env_file:
+      - .env
+    ports:
+      - 1080:80
+      - 10443:443
+    volumes:
+      - ./nginx/selfsigned.crt:/etc/ssl/certs/selfsigned.crt
+      - ./nginx/selfsigned.key:/etc/ssl/private/selfsigned.key
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+  
+  frontend-dev:
+    build:
+      context: capstone2-web
+      dockerfile: Dockerfile
+    working_dir: /app
+    volumes:
+      - ./capstone2-web:/app
+    env_file:
+      - .env
+      - ./capstone2-web/.env
+    command: npm run dev
+    stdin_open: true      # Keep stdin open (interactive)
+    tty: true             # Allocate a pseudo-TTY
+
+
+volumes:
+  postgres_data:

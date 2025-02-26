@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OAuth Callback Test</title>
+</head>
+<body>
+  <h1>OAuth Callback Test</h1>
+  <p id="message">Waiting for callback data...</p>
+  <script>
+    // Parse the query parameters from the URL
+    const params = new URLSearchParams(window.location.search);
+    const message = document.getElementById('message');
+
+    if (params.has("code")) {
+      const code = params.get("code");
+
+      // Construct redirect_uri dynamically using the host and current path
+      const redirectUri = `${window.location.origin}/auth/set-token.html`;
+
+      // Log parameters for debugging
+      console.log("Code:", code);
+      console.log("Redirect URI:", redirectUri);
+
+      // Send POST request to /services/accounts/token
+      fetch("/services/accounts/token/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          code: code,
+          redirect_uri: redirectUri,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          // Display response data
+          message.innerText = "Token exchange successful:\n" + JSON.stringify(data, null, 2);
+        })
+        .catch((error) => {
+          // Handle errors
+          console.error("Error exchanging token:", error);
+          message.innerText = "Error exchanging token. See console for details.";
+        });
+    } else {
+      message.innerText = "No authorization code received.";
+    }
+  </script>
+</body>
+</html>

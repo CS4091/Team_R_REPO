@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OAuth Login Test</title>
+</head>
+<body>
+  <h1>OAuth Login Test</h1>
+  <button id="loginButton">Login with Auth0</button>
+  <button id="logoutButton">Logout</button>
+
+  <script>
+    // Define your Auth0 details here
+    const AUTH0_DOMAIN = "dev-r07hfdo2l0bmdbu6.us.auth0.com"; // Replace with your Auth0 domain
+    const AUTH0_CLIENT_ID = "tRytuFD5gJSeIbEMeftqtYfXgEcKjAxV"; // Replace with your Auth0 client ID
+    const REDIRECT_URI = "https://localhost/auth/set-token.html"; // Callback URL
+
+    // Login button event
+    document.getElementById("loginButton").addEventListener("click", () => {
+      // Construct the authorization URL
+      const authUrl = `https://${AUTH0_DOMAIN}/authorize?` +
+        new URLSearchParams({
+          client_id: AUTH0_CLIENT_ID,
+          response_type: "code",
+          redirect_uri: REDIRECT_URI,
+          scope: "openid profile email", // Add scopes as needed
+          state: "someRandomState123" // Replace with a dynamically generated state in production
+        }).toString();
+
+      // Redirect the user to the Auth0 authorization endpoint
+      window.location.href = authUrl;
+    });
+
+    // Logout button event
+    document.getElementById("logoutButton").addEventListener("click", () => {
+      // Logout from Django by clearing the sessionid cookie
+      document.cookie = "sessionid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT; SameSite=Lax";
+
+      // Redirect the user to Auth0's logout endpoint
+      const logoutUrl = `https://${AUTH0_DOMAIN}/v2/logout?` +
+        new URLSearchParams({
+          client_id: AUTH0_CLIENT_ID,
+          returnTo: window.location.origin // Redirect back to the app after logout
+        }).toString();
+
+      // Redirect to logout URL
+      window.location.href = logoutUrl;
+    });
+  </script>
+</body>
+</html>
