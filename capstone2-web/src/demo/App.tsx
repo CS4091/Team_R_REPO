@@ -15,6 +15,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import InfoIcon from "@mui/icons-material/Info";
 import PhoneIcon from "@mui/icons-material/Phone";
 import { MapGridProvider } from '../hooks/useMapGrid'
+import PublicIcon from "@mui/icons-material/Public";
 
 const FooterItems = [
   { label: 'Kevin Lai', href: "http://lai.git-pages.mst.edu/lai" },
@@ -62,6 +63,15 @@ function App() {
       rolePages,
     ]
   }, [rolePages])
+
+  useEffect(() => {
+    if (!me) return 
+    setRolePages([
+      { label: 'Worlds', onClick: () => { navigate("/worlds") }, icon: <PublicIcon /> },
+    ])
+
+  }
+  , [ me ])
 
   return (
     <MapGridProvider>
