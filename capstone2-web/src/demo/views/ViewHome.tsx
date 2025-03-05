@@ -18,7 +18,7 @@ const HomePage: React.FC = () => {
   const [userCount, setUserCount] = useState(0);
 
   useEffect(() => {
-    fetch("/services/api/users")
+    fetch("/services/api/users/")
       .then((response) => response.json())
       .then((data) => {
         setUserCount(data.count || data.results?.length || 0);
