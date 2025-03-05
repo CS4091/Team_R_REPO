@@ -10,7 +10,7 @@ import DataViewContainer from '../components/DataViewContainer.tsx'
 import EsriMap from './EsriMap.tsx'
 import HomePage from './views/ViewHome.tsx'
 import AboutPage from './views/ViewAbout.tsx'
-
+import { MapGrid } from './GridMap.tsx'
 
 const Index: React.FC = () => {
   return (
@@ -32,7 +32,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "",
-        element: <DataViewContainer viewPanel={<EsriMap />} controlPanel={<HomePage />}></DataViewContainer>
+        element: <DataViewContainer viewPanel={<MapGrid />} controlPanel={<HomePage />}></DataViewContainer>
       },
       {
         path: "/about",

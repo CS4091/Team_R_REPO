@@ -9,4 +9,5 @@ router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='user')
 urlpatterns = [
     path('', include(router.urls)),  # Include the router's URLs
+    path('map/', views.generate_map_view),
 ]
