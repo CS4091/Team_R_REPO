@@ -11,8 +11,8 @@ import {
   Box
 } from "@mui/material";
 import PeopleIcon from "@mui/icons-material/People";
-import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
-import LocalFloristIcon from "@mui/icons-material/LocalFlorist";
+import FlightIcon from "@mui/icons-material/Flight";
+import PublicIcon from "@mui/icons-material/Public";
 
 const HomePage: React.FC = () => {
   // Fake data values
@@ -42,11 +42,11 @@ const HomePage: React.FC = () => {
         }, {
           title: "Number of Simulated Airplanes",
           value: `${deliverers} Airplanes`,
-          icon: <DirectionsCarIcon fontSize="large" color="primary" />
+          icon: <FlightIcon fontSize="large" color="primary" />
         }, {
           title: "Number of Worlds",
           value: `${distributors} Worlds`,
-          icon: <LocalFloristIcon fontSize="large" color="primary" />
+          icon: <PublicIcon fontSize="large" color="primary" />
         }].map((item, index) => (
           <Grid item xs={12} sm={4} key={index}>
             <Card sx={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
