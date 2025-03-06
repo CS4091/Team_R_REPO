@@ -22,7 +22,7 @@ const FooterItems = [
   { label: 'Samarth Sinha' },
   { label: 'Dominick Dickerson' },
   { label: 'Kshitij Sharma' },
-  { label: 'Noah Schabel' },
+  { label: 'Noah Schaben' },
   { label: 'Samual Pauley' },
 
 ]
