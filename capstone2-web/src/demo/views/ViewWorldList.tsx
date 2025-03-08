@@ -4,7 +4,8 @@ import { Button, TextField, IconButton, Card, CardContent, Box } from "@mui/mate
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Pagination } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 import { useMapGrid } from "../../hooks/useMapGrid";
-
+import { useModalStack } from "../../hooks/useModalStack";
+import CreateWorldForm from "../forms/CreateWorldForm";
 interface World {
   id: number;
   name: string;
@@ -15,6 +16,7 @@ interface World {
 const WorldList: React.FC = () => {
   const [worlds, setWorlds] = useState<World[]>([]);
   const [search, setSearch] = useState("");
+  const { pushModal } = useModalStack();
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const { setMap } = useMapGrid();
@@ -38,8 +40,8 @@ const WorldList: React.FC = () => {
   }, []);
 
   const handleAddWorld = useCallback(() => {
-    // Empty for now
-  }, []);
+    pushModal("Create World", <CreateWorldForm />);
+  }, [ pushModal ]);
 
   return (
     <>
