@@ -34,13 +34,13 @@ const HomePage: React.FC = () => {
   return (
     <Container>
       {/* Title and Description */}
-      <Typography variant="h4" align="center" gutterBottom sx={{ mt: 3 }}>
+      <Typography variant="h4" align="center" color="primary" gutterBottom sx={{ mt: 3 }}>
         Airplane Navigator
       </Typography>
-      <Typography variant="h5" align="center" gutterBottom>
+      <Typography variant="h5" align="center" color="primary" gutterBottom>
         Capstone 2 Project
       </Typography>
-      <Typography align="center" paragraph>
+      <Typography align="center" color="primary" paragraph>
         This application is for our senior project in Computer Science at
         Missouri S&T. The left side is a 2D grid that the user can control with
         a bot.
