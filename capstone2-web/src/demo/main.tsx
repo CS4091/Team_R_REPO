@@ -5,7 +5,7 @@ import { SnackbarProvider } from "../hooks/useSnackBar"
 import { ModalStackProvider } from "../hooks/useModalStack.tsx"
 import { AuthProvider, RedirectPage } from '../hooks/useAuth0.tsx'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-
+import AirplaneList from './views/AirplaneList.tsx'
 import DataViewContainer from '../components/DataViewContainer.tsx'
 import EsriMap from './EsriMap.tsx'
 import HomePage from './views/ViewHome.tsx'
@@ -49,7 +49,12 @@ const router = createBrowserRouter([
       },
       {
         path: "/worlds",
-        element: <DataViewContainer viewPanel={<MapGrid />} controlPanel={<WorldList />}></DataViewContainer>
+        element: <DataViewContainer viewPanel={<MapGrid />} controlPanel={<WorldList />}></DataViewContainer>,
+
+      },
+      {
+        path: "/worlds/:id",
+        element: <DataViewContainer viewPanel={<MapGrid />} controlPanel={<AirplaneList />}></DataViewContainer>
       }
     ]
   }

@@ -8,6 +8,7 @@ from api import views
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='user')
 router.register(r'worlds', views.WorldViewSet, basename='world')
+router.register(r'airplanes', views.AirplaneViewSet, basename='airplane')
 urlpatterns = [
     path('', include(router.urls)),  # Include the router's URLs
     path('map/', views.generate_map_view),
