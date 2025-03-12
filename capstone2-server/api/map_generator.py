@@ -117,4 +117,5 @@ def generate_map():
     lacunarity = random.uniform(1, 5)
     grid = generate_grid(width, height, scale, threshold, octaves, persistence, lacunarity)
     grid_list = [[[255, 255, 255] if cell == 1 else [0, 0, 0] for cell in row] for row in grid.tolist()]
-    return grid_list
+    pos = find_start_coordinate(grid)
+    return grid_list, pos

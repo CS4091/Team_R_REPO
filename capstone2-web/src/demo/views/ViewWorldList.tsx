@@ -3,7 +3,7 @@ import axios from "axios";
 import { Button, TextField, IconButton, Card, CardContent, Box } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Pagination } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
-import { useMapGrid } from "../../hooks/useMapGrid";
+import { useNavigate } from "react-router-dom";
 import { useModalStack } from "../../hooks/useModalStack";
 import CreateWorldForm from "../forms/CreateWorldForm";
 interface World {
@@ -19,7 +19,7 @@ const WorldList: React.FC = () => {
   const { pushModal } = useModalStack();
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const { setMap } = useMapGrid();
+  const navigate = useNavigate();
   useEffect(() => {
     axios.get(`/services/api/worlds?page=${page}&search=${search}`)
       .then((res) => {
@@ -36,8 +36,8 @@ const WorldList: React.FC = () => {
   }, []);
 
   const handleLoadMap = useCallback((world: World) => {
-      setMap(world.basemap)
-  }, []);
+    navigate(`/worlds/${world.id}`);
+  }, [ useNavigate ]);
 
   const handleAddWorld = useCallback(() => {
     pushModal("Create World", <CreateWorldForm />);
