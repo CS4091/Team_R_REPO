@@ -24,8 +24,19 @@ const AirplaneList: React.FC = () => {
   const itemsPerPage = 5;
   const { setMessageSnack } = useSnackbar();
 
+  const [ token, setToken ] = useState<string>("");
 
-  const token = "eyjyourtokenhere";
+  useEffect(() => { 
+    axios.get(`/services/api/worldtoken/?world=${id}`)
+      .then((res) => {
+        console.log(res.data)
+        setToken(res.data.world_token)
+      }).catch((err) => {
+        setMessageSnack("Failed to get token", "error")
+      })
+  }, [ setToken, id ])
+
+
 
   useEffect(() => {
     axios.get(`/services/api/worlds/${id}`)

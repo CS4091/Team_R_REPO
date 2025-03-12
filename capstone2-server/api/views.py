@@ -4,7 +4,12 @@ from .map_generator import generate_map
 from .serializers import AirplaneSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 import logging
+import os
+from datetime import datetime, timedelta
+import jwt
+from rest_framework.decorators import action
 
+JWT_SECRET = os.environ["JWT_SECRET"]
 logger = logging.getLogger(__name__)
 
 @api_view(["GET"])
@@ -18,6 +23,7 @@ def generate_map_view(request):
 from rest_framework import viewsets, permissions, pagination, filters
 from .models import World
 from .serializers import WorldSerializer
+
 
 class WorldPagination(pagination.PageNumberPagination):
     page_size = 10
@@ -70,3 +76,79 @@ class AirplaneViewSet(viewsets.ModelViewSet):
             pos_y=world.start_y,
             pos_x=world.start_x,
         )
+
+    @action(detail=True, methods=["POST"])
+    def move(self, request, pk=None):
+        airplane = self.get_object()
+        
+        if airplane.rotation == "UP":
+            airplane.pos_y -= 1
+        elif airplane.rotation == "DOWN":
+            airplane.pos_y += 1
+        elif airplane.rotation == "LEFT":
+            airplane.pos_x -= 1
+        elif airplane.rotation == "RIGHT":
+            airplane.pos_x += 1
+        airplane.save()
+    
+        return Response(self.get_serializer(airplane).data)
+    
+    @action(detail=True, methods=["POST"])
+    def rotate_left(self, request, pk=None):
+        airplane = self.get_object()
+        rotations = ["UP", "LEFT", "DOWN", "RIGHT"]
+        current_rotation_index = rotations.index(airplane.rotation)
+        new_rotation_index = (current_rotation_index - 1) % 4
+        airplane.rotation = rotations[new_rotation_index]
+        airplane.save()
+        
+        return Response(self.get_serializer(airplane).data)
+
+    @action(detail=True, methods=["POST"])
+    def rotate_right(self, request, pk=None):
+        airplane = self.get_object()
+        rotations = ["UP", "LEFT", "DOWN", "RIGHT"]
+        current_rotation_index = rotations.index(airplane.rotation)
+        new_rotation_index = (current_rotation_index + 1) % 4
+        airplane.rotation = rotations[new_rotation_index]
+        airplane.save()
+        
+        return Response(self.get_serializer(airplane).data)
+
+    
+
+@api_view(["GET"])
+def generate_world_token(request):
+    user = request.user
+    world = request.GET.get("world")
+    if world is None:
+        return Response({"error": "World ID is required"}, status=400)
+    payload = {
+        "sub": user.id,
+        "exp": datetime.utcnow() + timedelta(hours=1),
+        "world": world,  # Adding the world claim
+    }
+
+    world_token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+    return Response({"world_token": world_token})
+
+
+@api_view(["GET"])
+def world_token_info(request):
+    # extract token from Authorization header
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return Response({"error": "Authorization header is not provided."}, status=400)
+
+    world_token = auth_header.split(" ")[1]
+    if world_token is None:
+        return Response({"error": "World token is required"}, status=400)
+    try:
+        payload = jwt.decode(world_token, JWT_SECRET, algorithms=["HS256"])
+        return Response(payload)
+    except jwt.ExpiredSignatureError:
+        return Response({"error": "World token has expired"}, status=400)
+    except jwt.InvalidTokenError as e:
+        return Response({"error": "Invalid world token", "details": str(e)}, status=400)
+    except Exception as e:
+        return Response({"error": "An error occurred", "details": str(e)}, status=500)
