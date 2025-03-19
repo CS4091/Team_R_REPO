@@ -132,13 +132,21 @@ const AirplaneList: React.FC = () => {
       try {
         const response = await fetch(`/services/api/airplanes?world=${id}`);
         const data = await response.json();
-
+        
+        const scannedCellsCall = await axios.get(`/services/api/scanned-cell/?world=${id}&page_size=10000`);
+        
         // deep copy the basemap
         let newBasemap = JSON.parse(JSON.stringify(basemap));
 
         // Map dimensions
         const mapHeight = basemap.length;
         const mapWidth = basemap[0].length;
+
+        // First lets draw the scanned cells. We want a light yellow color for scanned cells
+        scannedCellsCall.data.results.forEach((scannedCell: any) => {
+          const color = [255, 255, 0];
+          newBasemap[scannedCell.pos_y][scannedCell.pos_x] = color;
+        });
 
         data.results.forEach((airplane: Airplane) => {
           // check if airplane is out of bounds
@@ -162,8 +170,7 @@ const AirplaneList: React.FC = () => {
             Math.floor(Math.random() * 155) + 100,
           ];
 
-          // Set airplane position with its unique color
-          newBasemap[airplane.pos_y][airplane.pos_x] = planeColor;
+     
 
           // Visualize orientation with a slight color variation in the direction of travel
           const directionColor = [
@@ -210,15 +217,15 @@ const AirplaneList: React.FC = () => {
 
           // Scanner coverage color - semi-transparent version of the plane color
           const scannerColor = [
-            Math.floor(planeColor[0] * 0.6),
-            Math.floor(planeColor[1] * 0.6),
-            Math.floor(planeColor[2] * 0.6),
+            0, 255, 0
           ];
 
           // Apply scanner coverage colors
           scannerCells.forEach(([x, y]) => {
             newBasemap[y][x] = scannerColor;
           });
+          // Set airplane position with its unique color
+          newBasemap[airplane.pos_y][airplane.pos_x] = planeColor;
         });
 
         setMap(newBasemap);

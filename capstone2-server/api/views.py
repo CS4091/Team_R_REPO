@@ -413,6 +413,25 @@ class CoverageStatisticsViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         return CoverageStatistics.objects.filter(world__owner=self.request.user)
     
+
+class ScannedCellViewSet(viewsets.ModelViewSet):
+    queryset = ScannedCell.objects.all()
+    serializer_class = ScannedCellSerializer
+    
+    class pagination_class(pagination.PageNumberPagination):
+        page_size = 100
+        page_size_query_param = 'page_size'
+        max_page_size = 10000
+
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['world', 'airplane']
+    # Optional: Override get_queryset if additional filtering is needed
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        # You can add additional filtering logic here if required
+        return queryset
+
+
 @api_view(["GET"])
 def generate_world_token(request):
     user = request.user

@@ -9,6 +9,7 @@ router.register(r'users', UserViewSet, basename='user')
 router.register(r'worlds', views.WorldViewSet, basename='world')
 router.register(r'airplanes', views.AirplaneViewSet, basename='airplane')
 router.register(r'coverage-statistics', views.CoverageStatisticsViewSet, basename='coverage-statistics')
+router.register(r'scanned-cell', views.ScannedCellViewSet, basename='scanned-cell')
 
 urlpatterns = [
     path('', include(router.urls)),  # Include the router's URLs
