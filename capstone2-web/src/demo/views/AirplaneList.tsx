@@ -144,8 +144,17 @@ const AirplaneList: React.FC = () => {
 
         // First lets draw the scanned cells. We want a light yellow color for scanned cells
         scannedCellsCall.data.results.forEach((scannedCell: any) => {
-          const color = [255, 255, 0];
-          newBasemap[scannedCell.pos_y][scannedCell.pos_x] = color;
+          let color = [0, 0, 0]
+          // if the scanned cell is from the base map [255, 255, 255], then we will mark it as grey
+          if (basemap[scannedCell.pos_y][scannedCell.pos_x][0] === 255 && basemap[scannedCell.pos_y][scannedCell.pos_x][1] === 255 && basemap[scannedCell.pos_y][scannedCell.pos_x][2] === 255) {
+            newBasemap[scannedCell.pos_y][scannedCell.pos_x] = [ 255, 255, 0 ];
+
+          }
+          else {
+          
+            newBasemap[scannedCell.pos_y][scannedCell.pos_x] = [ 255, 0, 0 ];
+          }
+          
         });
 
         data.results.forEach((airplane: Airplane) => {

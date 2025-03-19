@@ -71,7 +71,7 @@ class AirplaneViewSet(viewsets.ModelViewSet):
         max_page_size = 100
     
     def get_queryset(self):
-        return self.request.user.airplanes.all()
+        return Airplane.objects.all()
 
     def perform_create(self, serializer):
         world_id = self.request.data.get('world')
