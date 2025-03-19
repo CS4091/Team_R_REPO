@@ -5,6 +5,7 @@ from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 import os
 import jwt
 import logging
+import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -49,3 +50,15 @@ class CustomOAuthAuthentication(BaseAuthentication):
             raise AuthenticationFailed('Invalid token.')
         except User.DoesNotExist:
             raise AuthenticationFailed('User not found.')
+
+
+def generate_token_from_user(user):
+    # Generate a JWT token from the user
+    # Add expiration time
+    expiration_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=3600)
+
+    return jwt.encode({
+        'sub': str(user.id),
+        'exp': expiration_time
+    }, JWT_SECRET, algorithm='HS256')
+
