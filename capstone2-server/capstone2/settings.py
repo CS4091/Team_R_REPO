@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-t!wq!)-^h8e%t4w2mjt&9%x=wp7r*@rk=2gbmeracypk)#ojfo
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [ "127.0.0.1", "localhost", "server", "capstone2.e-itheta.com" ]
+ALLOWED_HOSTS = [ "0.0.0.0", "127.0.0.1", "localhost", "server", "capstone2.e-itheta.com" ]
 CSRF_TRUSTED_ORIGINS = [
     'https://localhost',  # Add this for HTTPS localhost
     'https://127.0.0.1',  # Add this for HTTPS using the loopback IP
@@ -158,7 +158,7 @@ REST_FRAMEWORK = {
 }
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = False
 
 
 LOGGING = {
