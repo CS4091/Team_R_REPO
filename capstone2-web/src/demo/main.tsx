@@ -7,11 +7,11 @@ import { AuthProvider, RedirectPage } from '../hooks/useAuth0.tsx'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import AirplaneList from './views/AirplaneList.tsx'
 import DataViewContainer from '../components/DataViewContainer.tsx'
-import EsriMap from './EsriMap.tsx'
 import HomePage from './views/ViewHome.tsx'
 import AboutPage from './views/ViewAbout.tsx'
 import { MapGrid } from './GridMap.tsx'
 import WorldList from "./views/ViewWorldList.tsx"
+import UserList from "./views/ViewUserList.tsx"
 
 const Index: React.FC = () => {
   return (
@@ -46,6 +46,10 @@ const router = createBrowserRouter([
       {
         path: "/error",
         element: <div>404</div>
+      },
+      {
+        path: "/users",
+        element: <DataViewContainer viewPanel={<MapGrid />} controlPanel={<UserList />}></DataViewContainer>,
       },
       {
         path: "/worlds",

@@ -10,12 +10,12 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import Header from "../components/Header"
 import SideMenu from '../components/SideMenu'
 import { useAuth0 } from '../hooks/useAuth0'
-import { useModalStack } from '../hooks/useModalStack'
 import HomeIcon from "@mui/icons-material/Home";
 import InfoIcon from "@mui/icons-material/Info";
 import PhoneIcon from "@mui/icons-material/Phone";
 import { MapGridProvider } from '../hooks/useMapGrid'
 import PublicIcon from "@mui/icons-material/Public";
+import PeopleIcon from "@mui/icons-material/People";
 
 const FooterItems = [
   { label: 'Kevin Lai', href: "http://lai.git-pages.mst.edu/lai" },
@@ -46,12 +46,11 @@ function App() {
   const navigate = useNavigate();
   const [rolePages, setRolePages] = useState<any[]>([])
 
-  const { pushModal, popModal } = useModalStack()
 
-  const { setMessageSnack, setLoadingSnack, closeSnack } = useSnackbar()
+
+  const { setLoadingSnack, closeSnack } = useSnackbar()
   const { login, logout, me } = useAuth0();
 
-  const [reload, setReload] = useState(false)
 
 
   const menuItems = useMemo(() => {
@@ -71,6 +70,7 @@ function App() {
     if (!me) return 
     setRolePages([
       { label: 'Worlds', onClick: () => { navigate("/worlds") }, icon: <PublicIcon /> },
+      { label: 'Users', onClick: () => { navigate("/users") }, icon: <PeopleIcon /> },
     ])
 
   }

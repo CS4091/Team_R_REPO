@@ -8,7 +8,6 @@ import {
   IconButton,
   Tooltip,
   Grid,
-  Box,
 } from "@mui/material";
 import PeopleIcon from "@mui/icons-material/People";
 import FlightIcon from "@mui/icons-material/Flight";
@@ -62,7 +61,7 @@ const HomePage: React.FC = () => {
       <Grid container spacing={3} justifyContent="center" sx={{ px: 2 }}>
         {[{
           title: "Users connected to our network",
-          value: `${userCount} Users`,
+          value: `${userCount} User(s)`,
           icon: <PeopleIcon fontSize="large" color="primary" />
         }, {
           title: "Number of Simulated Airplanes",
@@ -70,7 +69,7 @@ const HomePage: React.FC = () => {
           icon: <FlightIcon fontSize="large" color="primary" />
         }, {
           title: "Number of Worlds",
-          value: `${distCount} Worlds`,
+          value: `${distCount} World(s)`,
           icon: <PublicIcon fontSize="large" color="primary" />
         }].map((item, index) => (
           <Grid item xs={12} sm={4} key={index}>
