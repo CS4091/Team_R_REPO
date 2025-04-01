@@ -28,8 +28,20 @@ const HomePage: React.FC = () => {
       });
   }, []);
 
+  const [distCount, setDistCount] = useState(0);
+
+  useEffect(() => {
+    fetch("/services/api/worlds/")
+      .then((response) => response.json())
+      .then((data) => {
+        setDistCount(data.count || data.results?.length || 0);
+      })
+      .catch((error) => {
+        console.error("Error fetching world count:", error);
+      });
+  }, []);
+  
   const deliverers = 45;
-  const distributors = 30;
 
   return (
     <Container>
@@ -58,7 +70,7 @@ const HomePage: React.FC = () => {
           icon: <FlightIcon fontSize="large" color="primary" />
         }, {
           title: "Number of Worlds",
-          value: `${distributors} Worlds`,
+          value: `${distCount} Worlds`,
           icon: <PublicIcon fontSize="large" color="primary" />
         }].map((item, index) => (
           <Grid item xs={12} sm={4} key={index}>
