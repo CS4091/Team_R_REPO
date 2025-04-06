@@ -45,10 +45,12 @@ INSTALLED_APPS = [
     'rest_framework',  # Add DRF here
     'accounts',
     'api',
-    'django_filters'
+    'django_filters',
+    'corsheaders', # Added CORS headers app
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', # Added CORS middleware (place high)
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -193,3 +195,15 @@ LOGGING = {
         },
     },
 }
+
+# CORS Configuration
+CORS_ALLOWED_ORIGINS = [
+    "https://localhost:10443", # Allow frontend origin via Nginx proxy
+    # Add other origins if needed, e.g., production frontend URL
+]
+# Optional: If you need to allow credentials (cookies, auth headers)
+# CORS_ALLOW_CREDENTIALS = True
+# Optional: Allow specific headers if needed beyond defaults
+# CORS_ALLOW_HEADERS = list(default_headers) + ['my-custom-header']
+# Optional: Allow specific methods if needed beyond defaults (GET, POST, PUT, PATCH, DELETE, OPTIONS)
+# CORS_ALLOW_METHODS = list(default_methods) + ['my-custom-method']

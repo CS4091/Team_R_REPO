@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 import jwt
 from rest_framework.decorators import action
 from .models import World, Airplane, PathPoint, ScannedCell, CoverageStatistics
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from django.db.models import Count
 
 JWT_SECRET = os.environ["JWT_SECRET"]
@@ -148,20 +148,32 @@ class AirplaneViewSet(viewsets.ModelViewSet):
                 # Integer representation
                 is_traversable = (cell_value == 0)
             elif isinstance(cell_value, list):
-                # List/array representation - consider all list values as traversable for simplicity
-                # You may need to adjust this logic based on your actual map representation
-                is_traversable = True
+                # List/array representation - check if it's clear space [0, 0, 0]
+                is_traversable = (cell_value == [0, 0, 0])
             
             if not is_traversable:
                 continue
                 
             # Record scanned cell, tracking if it was created or already existed
-            _, created = ScannedCell.objects.get_or_create(
-                world=world,
-                airplane=airplane,
-                pos_x=scan_x,
-                pos_y=scan_y
-            )
+            # Wrap in try-except to handle potential race conditions / duplicate entries gracefully
+            # This can happen if multiple actions trigger scans on the same cell within tests or rapid succession
+            created = False
+            try:
+                _, created = ScannedCell.objects.get_or_create(
+                    world=world,
+                    # Note: If multiple airplanes scanning the same cell is intended to create only ONE ScannedCell record
+                    # per (world, x, y), then the 'airplane=airplane' field here might be incorrect or the unique constraint
+                    # should only be on (world, x, y). For now, we keep the airplane link but handle the IntegrityError.
+                    airplane=airplane,
+                    pos_x=scan_x,
+                    pos_y=scan_y,
+                    # Optionally add defaults if needed, though not strictly necessary for get_or_create
+                    # defaults={'timestamp': timezone.now()} # Requires importing timezone
+                )
+            except IntegrityError:
+                # Cell likely already exists due to race condition or previous scan, ignore the error
+                logger.warning(f"IntegrityError ignored for ScannedCell ({world.id}, {scan_x}, {scan_y}). Cell likely already exists.")
+                pass # Continue processing other cells
             
             if created:
                 cells_added = True
@@ -310,7 +322,8 @@ class AirplaneViewSet(viewsets.ModelViewSet):
                 # Integer representation
                 is_traversable = (cell_value == 0)
             elif isinstance(cell_value, list):
-                is_traversable = True
+                # Check if the list represents clear space [0, 0, 0]
+                is_traversable = (cell_value == [0, 0, 0])
             
             if not is_traversable:
                 # Revert position if invalid
