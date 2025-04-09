@@ -11,6 +11,7 @@ from rest_framework.decorators import action
 from .models import World, Airplane, PathPoint, ScannedCell, CoverageStatistics
 from django.db import transaction, IntegrityError
 from django.db.models import Count
+import random
 
 JWT_SECRET = os.environ["JWT_SECRET"]
 logger = logging.getLogger(__name__)
@@ -40,7 +41,16 @@ class WorldViewSet(viewsets.ModelViewSet):
         return World.objects.all()
 
     def perform_create(self, serializer):
-        basemap, (pos_y, pos_x) = generate_map()
+        basemap, _ = generate_map()
+
+        # generate random points until empty cell is found
+        pos_x, pos_y = None, None
+        while True:
+            pos_x = random.randint(0, len(basemap[0]) - 1)
+            pos_y = random.randint(0, len(basemap) - 1)
+            if basemap[pos_y][pos_x] != [255, 255, 255]:
+                break
+
         world = serializer.save(
             owner=self.request.user,
             basemap=basemap,
@@ -77,12 +87,20 @@ class AirplaneViewSet(viewsets.ModelViewSet):
         world_id = self.request.data.get('world')
         name = self.request.data.get('name')
         world = World.objects.get(id=world_id)
+        basemap = world.basemap
+        pos_x, pos_y = None, None
+        while True:
+            pos_x = random.randint(0, len(basemap[0]) - 1)
+            pos_y = random.randint(0, len(basemap) - 1)
+            if basemap[pos_y][pos_x] == [ 255, 255, 255 ]:
+                break
+
         airplane = serializer.save(
             owner=self.request.user,
             world=world,
             name=name,
-            pos_y=world.start_y,
-            pos_x=world.start_x,
+            pos_y=pos_y,
+            pos_x=pos_x,
         )
         
         # Record initial position in path
@@ -146,10 +164,10 @@ class AirplaneViewSet(viewsets.ModelViewSet):
             
             if isinstance(cell_value, int):
                 # Integer representation
-                is_traversable = (cell_value == 0)
+                is_traversable = (cell_value == 255)
             elif isinstance(cell_value, list):
                 # List/array representation - check if it's clear space [0, 0, 0]
-                is_traversable = (cell_value == [0, 0, 0])
+                is_traversable = (cell_value == [255,255, 255])
             
             if not is_traversable:
                 continue
@@ -320,10 +338,10 @@ class AirplaneViewSet(viewsets.ModelViewSet):
             is_traversable = False
             if isinstance(cell_value, int):
                 # Integer representation
-                is_traversable = (cell_value == 0)
+                is_traversable = (cell_value == 255)
             elif isinstance(cell_value, list):
                 # Check if the list represents clear space [0, 0, 0]
-                is_traversable = (cell_value == [0, 0, 0])
+                is_traversable = (cell_value == [ 255, 255, 255 ])
             
             if not is_traversable:
                 # Revert position if invalid

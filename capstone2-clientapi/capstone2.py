@@ -48,6 +48,21 @@ class Airplane:
             logger.error(error_msg)
             raise RuntimeError(error_msg) from e
         
+    
+    def get_grid(self):
+        try:
+            response = requests.get(
+                f"{self.host}/services/api/worlds/{self.world}",
+                headers={"Authorization": f"Bearer {self.token}"},
+                verify=not self.skip_ssl
+            )
+            response.raise_for_status()
+            return response.json()["basemap"]
+        except Exception as e:
+            logger.error(f"Failed to get grid: {str(e)}")
+            return {"error": str(e)}
+     
+
     def __exit__(self, exc_type, exc_value, traceback):
         if self.id is not None:
             try:
