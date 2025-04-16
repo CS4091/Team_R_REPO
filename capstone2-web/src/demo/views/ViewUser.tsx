@@ -3,31 +3,26 @@ import axios from "axios";
 import { Button, CardContent, Box } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Pagination } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-interface user {
+interface flightLog {
   id: number;
-  first_name: string;
-  last_name: string;
-  email: string;
+  airplane_name: string;
+  coverage: string;
+  world: string;
 }
 
 const UserList: React.FC = () => {
-  const [users, setusers] = useState<user[]>([]);
+  const [flightLogs, setFlightLogs] = useState<flightLog[]>([]);
   const [search] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const navigate = useNavigate();
   useEffect(() => {
-    axios.get(`/services/api/users?page=${page}&search=${search}`)
+    axios.get(`/services/api/flightlog?page=${page}&search=${search}`)
       .then((res) => {
-        setusers(res.data.results);
+        setFlightLogs(res.data.results);
         setTotalPages(Math.ceil(res.data.count / 10));
       })
       .catch((err) => console.error(err));
   }, [page, search]);
-
-  const handleLoadMap = useCallback((user: user) => {
-    navigate(`/users/${user.id}/flightlog`);
-  }, [ useNavigate ]);
 
 
   return (
@@ -44,19 +39,17 @@ const UserList: React.FC = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Email</TableCell>
+                <TableCell>AirplaneName</TableCell>
+                <TableCell>Coverage %</TableCell>
+                <TableCell>World</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <Button color="primary" onClick={() => handleLoadMap(user)}>
-                      {user.first_name} {user.last_name}
-                    </Button>
-                  </TableCell>
-                  <TableCell>{new String(user.email)}</TableCell>
+              {flightLogs.map((flightLog) => (
+                <TableRow key={flightLog.id}>
+                  <TableCell>{new String(flightLog.airplane_name)}</TableCell>
+                  <TableCell>{new String(flightLog.coverage)}</TableCell>
+                  <TableCell>{new String(flightLog.world)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

@@ -12,6 +12,7 @@ import AboutPage from './views/ViewAbout.tsx'
 import { MapGrid } from './GridMap.tsx'
 import WorldList from "./views/ViewWorldList.tsx"
 import UserList from "./views/ViewUserList.tsx"
+import FlightlogList from "./views/ViewFlightlog.tsx"
 
 const Index: React.FC = () => {
   return (
@@ -52,8 +53,13 @@ const router = createBrowserRouter([
         element: <DataViewContainer viewPanel={<MapGrid />} controlPanel={<UserList />}></DataViewContainer>,
       },
       {
+        path: "/users/:id/flightlog",
+        element:<DataViewContainer viewPanel={<MapGrid />} controlPanel={<FlightlogList />}></DataViewContainer>,
+      },
+      {
         path: "/worlds",
         element: <DataViewContainer viewPanel={<MapGrid />} controlPanel={<WorldList />}></DataViewContainer>,
+  
 
       },
       {

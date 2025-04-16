@@ -1,34 +1,36 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect} from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios";
-import { Button, CardContent, Box } from "@mui/material";
+import { CardContent, Box } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Pagination } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-interface user {
+
+interface flightlog {
   id: number;
-  first_name: string;
-  last_name: string;
-  email: string;
+  name: string;
+  coverage: string;
+  world: string;
 }
 
-const UserList: React.FC = () => {
-  const [users, setusers] = useState<user[]>([]);
+const FlightlogList: React.FC = () => {
+  const { id } = useParams()
+  const [flightlogs, setflightlogs] = useState<flightlog[]>([]);
   const [search] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const navigate = useNavigate();
+
+  const [ userData, setUserData ] = useState(null)
   useEffect(() => {
-    axios.get(`/services/api/users?page=${page}&search=${search}`)
+    // Grab Usr Data here /services/api/user/{id}
+  }, [])
+
+  useEffect(() => {
+    axios.get(`/services/api/flightlogs?page=${page}&search=${search}`)
       .then((res) => {
-        setusers(res.data.results);
+        setflightlogs(res.data.results);
         setTotalPages(Math.ceil(res.data.count / 10));
       })
       .catch((err) => console.error(err));
   }, [page, search]);
-
-  const handleLoadMap = useCallback((user: user) => {
-    navigate(`/users/${user.id}/flightlog`);
-  }, [ useNavigate ]);
-
 
   return (
     <>
@@ -49,14 +51,11 @@ const UserList: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <Button color="primary" onClick={() => handleLoadMap(user)}>
-                      {user.first_name} {user.last_name}
-                    </Button>
-                  </TableCell>
-                  <TableCell>{new String(user.email)}</TableCell>
+              {flightlogs.map((flightlog) => (
+                <TableRow key={flightlog.id}>
+                  <TableCell>{flightlog.name}</TableCell>
+                  <TableCell>{new String(flightlog.coverage)}</TableCell>
+                  <TableCell>{new String(flightlog.world)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -67,4 +66,4 @@ const UserList: React.FC = () => {
   );
 };
 
-export default UserList;
+export default FlightlogList;

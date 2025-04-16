@@ -27,6 +27,19 @@ const HomePage: React.FC = () => {
       });
   }, []);
 
+  const [flightCount, setFlightCount] = useState(0);
+
+  useEffect(() => {
+    fetch("/services/api/flightlog")
+    .then((response) => response.json())
+    .then((data) => {
+      setFlightCount(data.count || data.results?.length || 0);
+    })
+    .catch((error) => {
+      console.error("Error fetching flight count:", error);
+    });
+  }, []);
+
   const [distCount, setDistCount] = useState(0);
 
   useEffect(() => {
