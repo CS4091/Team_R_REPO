@@ -12,10 +12,12 @@ class WorldSerializer(serializers.ModelSerializer):
 class AirplaneSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.id')
     world = serializers.PrimaryKeyRelatedField(queryset=World.objects.all()) 
+    color = serializers.CharField(read_only=True)  # Ensure color is always included
+    flight_ended = serializers.BooleanField(required=False)
     class Meta:
         model = Airplane
         fields = "__all__"
-        read_only_fields = ['id', 'created_at', 'updated_at', 'rotation', 'pos_x', 'pos_y']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'rotation', 'pos_x', 'pos_y', 'color']
 
 class PathPointSerializer(serializers.ModelSerializer):
     class Meta:
