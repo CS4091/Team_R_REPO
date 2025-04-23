@@ -3,34 +3,51 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { CardContent, Box } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Pagination } from "@mui/material";
-
+/*
 interface flightlog {
-  id: number;
+  id: string;
   name: string;
   coverage: string;
   world: string;
 }
+*/
+interface userdata{
+  id: string;
+  first_name: string;
+  last_name: string;
+
+}
+const tempVar: userdata= {
+  id : "",
+  first_name : "",
+  last_name : "",
+}
+
+const arrUser: userdata[] =[];
+
 
 const FlightlogList: React.FC = () => {
-  const { id } = useParams()
-  const [flightlogs, setflightlogs] = useState<flightlog[]>([]);
+  const { id } = useParams();
   const [search] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
-  const [ userData, setUserData ] = useState(null)
+  const [ userDatalist, setuserdata ] = useState ();
   useEffect(() => {
     // Grab Usr Data here /services/api/user/{id}
-  }, [])
+    axios.get(`/services/api/users/${id}`)
+    .then((res) => {
 
-  useEffect(() => {
-    axios.get(`/services/api/flightlogs?page=${page}&search=${search}`)
-      .then((res) => {
-        setflightlogs(res.data.results);
-        setTotalPages(Math.ceil(res.data.count / 10));
-      })
-      .catch((err) => console.error(err));
-  }, [page, search]);
+      tempVar.id = res.data.id;
+      tempVar.first_name = res.data.first_name;
+      tempVar.last_name = res.data.last_name;
+      arrUser.push(tempVar);
+
+      setuserdata(res.data.results);
+      setTotalPages(Math.ceil(res.data.count / 10));
+      console.log(res.data);
+    })
+    .catch((err) => console.error(err));
+  }, [page, search])
 
   return (
     <>
@@ -47,15 +64,16 @@ const FlightlogList: React.FC = () => {
             <TableHead>
               <TableRow>
                 <TableCell>Name</TableCell>
-                <TableCell>Email</TableCell>
+                <TableCell>Coverage</TableCell>
+                <TableCell>World</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {flightlogs.map((flightlog) => (
-                <TableRow key={flightlog.id}>
-                  <TableCell>{flightlog.name}</TableCell>
-                  <TableCell>{new String(flightlog.coverage)}</TableCell>
-                  <TableCell>{new String(flightlog.world)}</TableCell>
+              {arrUser.map((data) => (
+                <TableRow key={data.id}>
+                  <TableCell>{data.first_name}</TableCell>
+                  <TableCell>{new String(data.last_name)}</TableCell>
+                  <TableCell>{new String(data.first_name)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
