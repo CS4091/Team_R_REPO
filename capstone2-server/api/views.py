@@ -434,6 +434,16 @@ class AirplaneViewSet(viewsets.ModelViewSet):
         
         return Response(self.get_serializer(airplane).data)
 
+    @action(detail=True, methods=["POST"])
+    def end_flight(self, request, pk=None):
+        """
+        Mark the flight as ended for this airplane.
+        """
+        airplane = self.get_object()
+        airplane.flight_ended = True
+        airplane.save()
+        return Response(self.get_serializer(airplane).data)
+
 # Add a new viewset for coverage statistics
 class CoverageStatisticsViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = CoverageStatisticsSerializer

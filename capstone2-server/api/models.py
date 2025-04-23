@@ -1,5 +1,6 @@
 from django.db import models
 from accounts.models import User
+import random
 
 # Create your models here.
 
@@ -35,9 +36,20 @@ class Airplane(models.Model):
         (Direction.LEFT, 'LEFT'),
         (Direction.RIGHT, 'RIGHT'),
     ], default=Direction.UP)
+    color = models.CharField(max_length=7, default=None, blank=True, null=True)  # RGB hex string like '#A1B2C3'
+    flight_ended = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
+    def save(self, *args, **kwargs):
+        if not self.color:
+            self.color = '#{:02X}{:02X}{:02X}'.format(
+                random.randint(0, 255),
+                random.randint(0, 255),
+                random.randint(0, 255)
+            )
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.name
 

@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DeleteIcon from "@mui/icons-material/Delete";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import axios from "axios";
 import { useMapGrid } from "../../hooks/useMapGrid";
 import { useSnackbar } from "../../hooks/useSnackBar";
@@ -22,6 +23,8 @@ interface Airplane {
   pos_x: number;
   pos_y: number;
   rotation: "UP" | "DOWN" | "LEFT" | "RIGHT";
+  color: string; // Add color property
+  flight_ended?: boolean;
 }
 
 const AirplaneList: React.FC = () => {
@@ -132,9 +135,11 @@ const AirplaneList: React.FC = () => {
       try {
         const response = await fetch(`/services/api/airplanes?world=${id}`);
         const data = await response.json();
-        
-        const scannedCellsCall = await axios.get(`/services/api/scanned-cell/?world=${id}&page_size=10000`);
-        
+
+        const scannedCellsCall = await axios.get(
+          `/services/api/scanned-cell/?world=${id}&page_size=10000`
+        );
+
         // deep copy the basemap
         let newBasemap = JSON.parse(JSON.stringify(basemap));
 
@@ -144,17 +149,17 @@ const AirplaneList: React.FC = () => {
 
         // First lets draw the scanned cells. We want a light yellow color for scanned cells
         scannedCellsCall.data.results.forEach((scannedCell: any) => {
-          let color = [0, 0, 0]
+          let color = [0, 0, 0];
           // if the scanned cell is from the base map [255, 255, 255], then we will mark it as grey
-          if (basemap[scannedCell.pos_y][scannedCell.pos_x][0] === 255 && basemap[scannedCell.pos_y][scannedCell.pos_x][1] === 255 && basemap[scannedCell.pos_y][scannedCell.pos_x][2] === 255) {
-            newBasemap[scannedCell.pos_y][scannedCell.pos_x] = [ 255, 255, 0 ];
-
+          if (
+            basemap[scannedCell.pos_y][scannedCell.pos_x][0] === 255 &&
+            basemap[scannedCell.pos_y][scannedCell.pos_x][1] === 255 &&
+            basemap[scannedCell.pos_y][scannedCell.pos_x][2] === 255
+          ) {
+            newBasemap[scannedCell.pos_y][scannedCell.pos_x] = [255, 255, 0];
+          } else {
+            newBasemap[scannedCell.pos_y][scannedCell.pos_x] = [255, 0, 0];
           }
-          else {
-          
-            newBasemap[scannedCell.pos_y][scannedCell.pos_x] = [ 255, 0, 0 ];
-          }
-          
         });
 
         data.results.forEach((airplane: Airplane) => {
@@ -172,20 +177,25 @@ const AirplaneList: React.FC = () => {
             return;
           }
 
-          // Generate unique color for this airplane
+          // Use airplane color from backend
           const planeColor = [
-            Math.floor(Math.random() * 155) + 100, // Brighter colors (100-255)
-            Math.floor(Math.random() * 155) + 100,
-            Math.floor(Math.random() * 155) + 100,
+            parseInt(airplane.color.slice(1, 3), 16),
+            parseInt(airplane.color.slice(3, 5), 16),
+            parseInt(airplane.color.slice(5, 7), 16),
           ];
-
-     
 
           // Visualize orientation with a slight color variation in the direction of travel
           const directionColor = [
             Math.min(255, planeColor[0] * 1.2), // Slightly brighter color
             Math.min(255, planeColor[1] * 1.2),
             Math.min(255, planeColor[2] * 1.2),
+          ];
+
+          // Radar/scanner color: complementary color of planeColor
+          const scannerColor = [
+            255 - planeColor[0],
+            255 - planeColor[1],
+            255 - planeColor[2],
           ];
 
           // Add orientation indicator (a colored cell in front of the airplane)
@@ -224,11 +234,6 @@ const AirplaneList: React.FC = () => {
             mapHeight
           );
 
-          // Scanner coverage color - semi-transparent version of the plane color
-          const scannerColor = [
-            0, 255, 0
-          ];
-
           // Apply scanner coverage colors
           scannerCells.forEach(([x, y]) => {
             newBasemap[y][x] = scannerColor;
@@ -257,6 +262,15 @@ const AirplaneList: React.FC = () => {
       .delete(`/services/api/airplanes/${id}/`)
       .then(() => setMessageSnack("Airplane deleted successfully", "success"))
       .catch((err) => console.error(err));
+  };
+
+  const handleEndFlight = async (id: number) => {
+    try {
+      await axios.post(`/services/api/airplanes/${id}/end_flight/`);
+      setMessageSnack("Flight marked as done.", "success");
+    } catch (err) {
+      setMessageSnack("Failed to mark flight as done.", "error");
+    }
   };
 
   const handlePageChange = (
@@ -309,10 +323,25 @@ const AirplaneList: React.FC = () => {
                   Updated: {new Date(plane.updated_at).toLocaleString()} <br />
                   Position: ({plane.pos_x}, {plane.pos_y}) | Facing:{" "}
                   {plane.rotation}
+                  {plane.flight_ended && (
+                    <span style={{ color: "green", marginLeft: 8 }}>
+                      (Flight Ended)
+                    </span>
+                  )}
                 </>
               }
             />
             <ListItemSecondaryAction>
+              {!plane.flight_ended && (
+                <Tooltip title="Mark flight as done">
+                  <IconButton
+                    edge="end"
+                    onClick={() => handleEndFlight(plane.id)}
+                  >
+                    <CheckCircleIcon color="primary" />
+                  </IconButton>
+                </Tooltip>
+              )}
               <Tooltip title="Delete">
                 <IconButton edge="end" onClick={() => handleDelete(plane.id)}>
                   <DeleteIcon />
