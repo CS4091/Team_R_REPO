@@ -12,7 +12,7 @@ GRID_WIDTH = 100
 GRID_HEIGHT = 100
 
 # Coverage threshold (80% of free cells)
-COVERAGE_THRESHOLD = 0.1
+COVERAGE_THRESHOLD = 0.8
 
 # Define possible orientations (0: North, 1: East, 2: South, 3: West)
 ORIENTATIONS = ["UP", "RIGHT", "DOWN", "LEFT"]
@@ -34,7 +34,6 @@ class gridState:
     path = ""
     pos = 0, 0
     orientation = "UP"
-
 
 def get_sensor_footprint(position, orientation):
     """
@@ -127,7 +126,7 @@ def compute_coverage(visited, grid):
     covered_cells = np.sum(visited)
     return covered_cells / free_cells if free_cells > 0 else 0
 
-def compute_path(grid, position, orientation, max_steps=10000):
+def compute_path(grid, position, orientation, max_steps=6000):
     """
     Calculate the cost for each next position to travel to for the next step. This will be through a semi-Dijkstra related formula 
     Moving forward cost = 1  DONE
@@ -149,10 +148,14 @@ def compute_path(grid, position, orientation, max_steps=10000):
     cur.pos = position
 
     vector.insert(0, cur)
+    steps = 0
     #fix: add an initializer moment to make at least one test attempt so vector isn't empty
     while compute_coverage(cur.visited, grid) < COVERAGE_THRESHOLD:
         print(compute_coverage(cur.visited, grid))
         print("COST IS: ",cur.cost)
+        print("STEPS IS: ", steps)
+        if steps == max_steps:
+            return vector[0].path
 
         temp = vector[0]
         vector.pop(0)
@@ -176,6 +179,7 @@ def compute_path(grid, position, orientation, max_steps=10000):
                 posCheck = cur.pos
                 cur.orientation = ORIENTATIONS[(ORIENTATIONS.index(cur.orientation) - 1) % 4]
                 compute_step(cur, grid ,vector, posChange, cur.pos, cur.orientation)
+                steps+=1
     return vector[0].path
 
     #initialize array
@@ -195,7 +199,6 @@ def compute_step(cur, grid, vector, posChange, posCheck, orientation):
             cur.pos = posCheck
 
         cur.cost+=1
-
         cur.path = cur.path + posChange
         #calculate foortprint 
         footprint = get_sensor_footprint(cur.pos, cur.orientation)
@@ -268,7 +271,7 @@ def main():
         start_orientation = rotation
         
         # Run the simulation
-        path = compute_path(grid, start_position, start_orientation, max_steps=10000)
+        path = compute_path(grid, start_position, start_orientation, max_steps=6000)
     
         next_position = start_position
         next_orientation = start_orientation
