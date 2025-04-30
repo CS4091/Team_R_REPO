@@ -1,6 +1,6 @@
 import pathlib
 import random
-
+import json
 import numpy as np
 from noise import snoise2
 
@@ -118,4 +118,8 @@ def generate_map():
     grid = generate_grid(width, height, scale, threshold, octaves, persistence, lacunarity)
     grid_list = [[[255, 255, 255] if cell == 1 else [0, 0, 0] for cell in row] for row in grid.tolist()]
     pos = find_start_coordinate(grid)
+
+    
+    with open("/app/api/output.json") as fp:
+        grid_list = json.load(fp)
     return grid_list, pos
