@@ -72,7 +72,6 @@ def apply_action(airplane: Airplane, position, orientation, action, grid):
         def dothis():
             result = airplane.move()
             try:
-                
                 new_position = result["pos_y"], result["pos_x"]
                 return new_position, orientation
             except:
@@ -162,7 +161,7 @@ def simulate_flight(airplane: Airplane, grid, start_position, start_orientation,
             next_position, next_orientation, dothis = apply_action(airplane, current_position, current_orientation, action, grid)
             if next_position is None:
                 continue  # invalid move
-            
+
             # Determine sensor coverage from the potential new state.
             footprint = get_sensor_footprint(next_position, next_orientation)
             new_cells = 0
@@ -234,9 +233,6 @@ def main():
         start_x = int(status["pos_x"])
         start_y = int(status["pos_y"])
         rotation = status["rotation"]
-        
-
-
 
         # Set starting position and orientation (choose a free cell)
         start_position = start_y, start_x
@@ -244,7 +240,7 @@ def main():
             # If starting cell is an obstacle, choose an alternative free cell.
             start_position = (GRID_HEIGHT - 1, 1)
         start_orientation = rotation
-        
+
         # Run the simulation
         path, orientations, visited = simulate_flight(airplane, grid, start_position, start_orientation)
     

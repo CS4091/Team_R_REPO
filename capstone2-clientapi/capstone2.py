@@ -19,7 +19,7 @@ class Airplane:
         if self.world is None:
             raise ValueError("Invalid token. Missing 'world' claim")
         self.id = None
-        
+
     def __enter__(self):
         try:
             response = requests.post(
@@ -30,7 +30,7 @@ class Airplane:
             )
             response.raise_for_status()
             result = response.json()
-                
+
             self.id = result["id"]
             self.world = result.get("world", self.world)  # Update world if provided
             logger.info(f"Created airplane: {self.name} with ID {self.id}")
@@ -47,7 +47,20 @@ class Airplane:
             
             logger.error(error_msg)
             raise RuntimeError(error_msg) from e
-        
+
+    def get_scanned_cell(self):
+        try:
+            response = requests.get(
+                f"{self.host}/services/api/scanned-cell/?airplane={self.id}",
+                headers={"Authorization": f"Bearer {self.token}"},
+                verify=not self.skip_ssl
+            )
+            response.raise_for_status()
+            result = response.json()['results']
+            return result
+
+        except Exception as e:
+            logger.error(f"Failed to get scanned cells: {str(e)}")
     
     def get_grid(self):
         try:
@@ -61,7 +74,7 @@ class Airplane:
         except Exception as e:
             logger.error(f"Failed to get grid: {str(e)}")
             return {"error": str(e)}
-     
+
 
     def __exit__(self, exc_type, exc_value, traceback):
         if self.id is not None:
